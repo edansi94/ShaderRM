@@ -1025,7 +1025,7 @@ Pass 0]]></RmTextDataBlock></RmStringVariable>
     </RmRegistryBranch>
     <RmRegistryBranch NAME="WORKSPACE" API="" XML_VERSION="RenderMonkey 1.71">
      <RmStringVariable NAME="LAST_SAVE" API="" ARTIST_EDITABLE="FALSE" VARIABLE_SEMANTIC=""><RmTextDataBlock TYPE="TEXT"><![CDATA[
-7/10/2016 22:37:55]]></RmTextDataBlock></RmStringVariable>
+7/10/2016 23:3:19]]></RmTextDataBlock></RmStringVariable>
      <RmStringVariable NAME="VERSION" API="" ARTIST_EDITABLE="FALSE" VARIABLE_SEMANTIC=""><RmTextDataBlock TYPE="TEXT"><![CDATA[
 RenderMonkey Version 1.82 (build 322)]]></RmTextDataBlock></RmStringVariable>
      <RmStringVariable NAME="XML_VERSION" API="" ARTIST_EDITABLE="FALSE" VARIABLE_SEMANTIC=""><RmTextDataBlock TYPE="TEXT"><![CDATA[
@@ -1178,13 +1178,13 @@ void main(void)
    
    // Se cargan las texturas.
    vec4 cTerreno_color = texture2D(terreno_color,repeatUV);
-   vec3 cTerreno_normal = (texture2D(terreno_normal,repeatUV).xyz *2.0);
+   vec3 cTerreno_normal = (texture2D(terreno_normal,repeatUV).xyz *2.0) - 1.0;
    vec4 cTerreno_shadow = texture2D(terreno_shadow,repeatUV);
    vec4 cTerreno_moho = texture2D(terreno_moho,repeatUV);
    
    vec4 cTerreno_snow = texture2D(terreno_snow,repeatUV);
    vec4 cTerreno_color_snow = texture2D(terreno_color_snow,repeatUV);
-   vec4 cTerreno_snow_normal = texture2D(terreno_snow_normal,repeatUV);
+   vec4 cTerreno_snow_normal = (texture2D(terreno_snow_normal,repeatUV).xyz * 2.0) - 1.0;
    
    vec4 cTerreno_specular = texture2D(terreno_specular,repeatUV);
 
@@ -1195,6 +1195,9 @@ void main(void)
    }else{
      N = normalize(vN);
    }
+
+   // Vector normal de la nieve.
+   vec3 normalNieve = normalize(cTerreno_snow_normal) + N;
 
    // Fresnel
    float dotCN = pow(1-(max(dot(normalize(vC), normalize(N)),0.0)),iS);
@@ -1219,7 +1222,7 @@ void main(void)
    // Producto punto entre el vector de reflexión y la camara.
    float dotRC = pow(max(dot(normalize(r),normalize(vC)),0.0),shine);
    //vec4 componenteSpec = (mix(0,cTerreno_specular.x,1)) * iS* cS * dotRC;
-   vec4 componenteSpec = iS* cS * dotRC;
+   vec4 componenteSpec = mix(0, cterreno_specular.x, iS) * cS * dotRC;
     
    vec4 colorFinal =  ambiental + iL*cL*(iD*colorDifuso + componenteSpec);
    gl_FragColor = colorFinal;
